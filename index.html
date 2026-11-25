@@ -94,10 +94,16 @@
     background: var(--card); border-radius: 22px; padding: 28px 22px 22px; box-shadow: var(--shadow);
     border: 1px solid var(--line); position: relative;
   }
-  .quote::before { content: "「"; position: absolute; top: 6px; left: 14px; font-size: 40px; color: var(--gold-soft); font-family: "Noto Serif TC", serif; }
-  .qbody { font-size: 21px; line-height: 1.85; font-weight: 700; white-space: pre-line; padding: 8px 4px 0; }
-  .qby { margin-top: 14px; text-align: right; color: var(--gold); font-size: 15px; }
-  .qsrc { margin-top: 4px; text-align: right; font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+  .quote { padding: 34px 20px 24px; text-align: center; }
+  .quote::before { content: ""; position: absolute; top: 18px; left: 50%; width: 36px; height: 2px; margin-left: -18px; background: var(--gold); opacity: .7; border-radius: 2px; }
+  .qbody { font-size: clamp(17px, 5.2vw, 21px); line-height: 2; letter-spacing: .06em; font-weight: 700; padding: 6px 0 0; text-wrap: balance; }
+  .qby, .qsrc { text-align: center; }
+  .qby { margin-top: 18px; letter-spacing: .08em; }
+  /* 每個以標點結尾的短句是一塊，只在短句之間換行，不把「黃金」切成兩行 */
+  .qbody .ph { display: inline-block; white-space: nowrap; }
+  .qbody.wrap .ph { white-space: normal; max-width: 100%; }
+  .qby { color: var(--gold); font-size: 15px; }
+  .qsrc { margin-top: 4px; font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
   .qsrc a { color: inherit; }
   .note { font-size: 14.5px; line-height: 1.8; color: var(--ink-soft); background: color-mix(in srgb, var(--gold-soft) 30%, transparent); border-radius: 14px; padding: 12px 14px; }
   .note b { color: var(--ink); font-weight: 700; }
@@ -357,23 +363,61 @@ function renderResult() {
   const r = RESULTS[state], q = r.quotes[qi];
   $("rtitle").textContent = r.title;
   $("rlead").textContent = r.lead;
-  $("qbody").textContent = q.t;
+  $("qbody").innerHTML = q.t.split("\n").map((line) =>
+    phrases(line).map((p) => `<span class="ph">${p}</span>`).join("")).join("<br>");
+  fitQuote();
   $("qsrc").innerHTML = `出處：<a href="${q.u}" target="_blank" rel="noopener">${q.s}</a>`;
   $("note").innerHTML = `<b>小編想說：</b>${q.n}`;
 }
 
+// 最長的短句放不下一行時，把整句字級等比縮小（最小 15px）；還是放不下才允許短句內換行
+function fitQuote() {
+  const box = $("qbody");
+  box.classList.remove("wrap");
+  box.style.fontSize = "";
+  const phs = [...box.querySelectorAll(".ph")];
+  const widest = Math.max(...phs.map((p) => p.offsetWidth));
+  const room = box.clientWidth;
+  if (!room || widest <= room) return;
+  const size = parseFloat(getComputedStyle(box).fontSize) * room / widest * 0.98;
+  box.style.fontSize = `${Math.max(15, size)}px`;
+  if (size < 15) box.classList.add("wrap");
+}
+addEventListener("resize", () => { if ($("result").classList.contains("on")) fitQuote(); });
+
+// 把一行法語切成以標點結尾的短句（「知足如點金石，」「可使接觸的東西變黃金──幸福；」）
+function phrases(line) {
+  return line.match(/[^，。、；：！？]+[，。、；：！？」』）]*|[，。、；：！？]+/g) || [line];
+}
+
+// 一個短句本身太長時才逐字切，標點不放行首
+function charWrap(ctx, text, maxWidth) {
+  const out = [];
+  let line = "";
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      if ("，。、；：！？」）』".includes(ch)) { out.push(test); line = ""; continue; }
+      out.push(line); line = ch;
+    } else line = test;
+  }
+  if (line) out.push(line);
+  return out;
+}
+
 // 9:16 限動圖卡：用 canvas 畫，產生圖片讓使用者長按儲存（IG 內建瀏覽器常擋下載）
+// 換行規則和網頁相同：優先在短句之間換行
 function wrapLines(ctx, text, maxWidth) {
   const lines = [];
   text.split("\n").forEach((para) => {
     let line = "";
-    for (const ch of para) {
-      const test = line + ch;
-      if (ctx.measureText(test).width > maxWidth && line) {
-        // 標點不放行首
-        if ("，。、；：！？」）』".includes(ch)) { lines.push(test); line = ""; continue; }
-        lines.push(line); line = ch;
-      } else line = test;
+    for (const p of phrases(para)) {
+      if (ctx.measureText(line + p).width <= maxWidth) { line += p; continue; }
+      if (line) lines.push(line);
+      if (ctx.measureText(p).width <= maxWidth) { line = p; continue; }
+      const parts = charWrap(ctx, p, maxWidth);
+      line = parts.pop();
+      lines.push(...parts);
     }
     if (line) lines.push(line);
   });
@@ -405,8 +449,10 @@ async function makeCard() {
 
   let size = 62;
   x.font = `700 ${size}px "Noto Serif TC", serif`;
+  // 字級縮到最長的短句放得下一行、總行數不超過 8 行為止（和網頁一樣不切開短句）
+  const widest = () => Math.max(...q.t.split("\n").flatMap(phrases).map((p) => x.measureText(p).width));
   let lines = wrapLines(x, q.t, 820);
-  while (lines.length > 8 && size > 46) { size -= 4; x.font = `700 ${size}px "Noto Serif TC", serif`; lines = wrapLines(x, q.t, 820); }
+  while ((widest() > 820 || lines.length > 8) && size > 44) { size -= 2; x.font = `700 ${size}px "Noto Serif TC", serif`; lines = wrapLines(x, q.t, 820); }
   const lh = size * 1.75, top = 960 - (lines.length * lh) / 2 + size * 0.4;
   x.fillStyle = "#fbf3e4";
   lines.forEach((l, i) => x.fillText(l, W / 2, top + i * lh));

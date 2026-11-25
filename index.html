@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>給此刻的你</title>
+<meta name="description" content="回答 5 個小問題，收下一句給此刻的你的星雲大師法語。佛光山 @fgs_ig">
+<meta property="og:title" content="給此刻的你，一句星雲大師的話">
+<meta property="og:description" content="5 個小問題，找到陪你度過今天的那一句。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6efe3;
+    --bg-deep: #ecdfc8;
+    --card: #fffaf1;
+    --ink: #3b2b1f;
+    --ink-soft: #7a6553;
+    --gold: #b8873a;
+    --gold-soft: #e7cf9f;
+    --line: #e2d3b8;
+    --shadow: 0 10px 30px rgba(84, 58, 30, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1f1812; --bg-deep: #2a2018; --card: #2b2219; --ink: #f3e9d8;
+      --ink-soft: #c2ae95; --gold: #e0b465; --gold-soft: #5a4628; --line: #44372a;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1f1812; --bg-deep: #2a2018; --card: #2b2219; --ink: #f3e9d8;
+    --ink-soft: #c2ae95; --gold: #e0b465; --gold-soft: #5a4628; --line: #44372a;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(120% 80% at 50% 0%, var(--bg) 40%, var(--bg-deep) 100%) fixed;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 440px; min-height: 100svh; margin: 0 auto;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    display: flex; flex-direction: column;
+  }
+  .brand { font-size: 13px; letter-spacing: .12em; color: var(--gold); text-align: center; padding: 6px 0 18px; }
+  .screen { display: none; flex: 1; flex-direction: column; animation: fade .45s ease both; }
+  .screen.on { display: flex; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .serif { font-family: "Noto Serif TC", "PMingLiU", serif; }
+
+  /* 開場 */
+  #intro { justify-content: center; text-align: center; gap: 22px; }
+  .lotus { width: 64px; height: 64px; margin: 0 auto; color: var(--gold); }
+  #intro h1 { font-size: 30px; line-height: 1.45; font-weight: 700; }
+  #intro h1 em { font-style: normal; color: var(--gold); }
+  #intro p { color: var(--ink-soft); line-height: 1.8; font-size: 15px; }
+  .btn {
+    appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 17px;
+    padding: 15px 22px; border-radius: 999px; background: var(--ink); color: var(--card);
+    box-shadow: var(--shadow); transition: transform .15s ease;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); box-shadow: none; font-weight: 500; }
+
+  /* 題目 */
+  .progress { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 26px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .4s ease; }
+  .qno { font-size: 13px; color: var(--gold); letter-spacing: .1em; margin-bottom: 8px; }
+  .qtext { font-size: 23px; line-height: 1.5; font-weight: 700; margin-bottom: 22px; }
+  .opts { display: flex; flex-direction: column; gap: 11px; }
+  .opt {
+    appearance: none; text-align: left; font: inherit; font-size: 16px; line-height: 1.5; color: var(--ink);
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 14px 16px;
+    cursor: pointer; display: flex; gap: 12px; align-items: center; transition: border-color .15s, transform .15s;
+  }
+  .opt:active { transform: scale(.98); }
+  .opt.picked { border-color: var(--gold); background: color-mix(in srgb, var(--gold-soft) 45%, var(--card)); }
+  .opt .emo { font-size: 22px; width: 28px; text-align: center; flex: none; }
+  .back { margin-top: auto; padding-top: 22px; align-self: center; background: none; border: 0; color: var(--ink-soft); font: inherit; font-size: 14px; cursor: pointer; }
+
+  /* 結果 */
+  #result { gap: 16px; }
+  .tag { align-self: center; font-size: 13px; color: var(--gold); border: 1px solid var(--gold-soft); padding: 4px 12px; border-radius: 99px; }
+  .rtitle { text-align: center; font-size: 25px; font-weight: 700; }
+  .rlead { text-align: center; color: var(--ink-soft); font-size: 15px; line-height: 1.8; text-wrap: balance; }
+  .qbody, .note, .qtext { text-wrap: pretty; }
+  .quote {
+    background: var(--card); border-radius: 22px; padding: 28px 22px 22px; box-shadow: var(--shadow);
+    border: 1px solid var(--line); position: relative;
+  }
+  .quote::before { content: "「"; position: absolute; top: 6px; left: 14px; font-size: 40px; color: var(--gold-soft); font-family: "Noto Serif TC", serif; }
+  .qbody { font-size: 21px; line-height: 1.85; font-weight: 700; white-space: pre-line; padding: 8px 4px 0; }
+  .qby { margin-top: 14px; text-align: right; color: var(--gold); font-size: 15px; }
+  .qsrc { margin-top: 4px; text-align: right; font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+  .qsrc a { color: inherit; }
+  .note { font-size: 14.5px; line-height: 1.8; color: var(--ink-soft); background: color-mix(in srgb, var(--gold-soft) 30%, transparent); border-radius: 14px; padding: 12px 14px; }
+  .note b { color: var(--ink); font-weight: 700; }
+  .row { display: flex; gap: 10px; }
+  .row .btn { flex: 1; font-size: 15px; padding: 13px 10px; }
+  .follow { text-align: center; font-size: 14px; color: var(--ink-soft); line-height: 1.8; }
+  .follow a { color: var(--gold); font-weight: 700; text-decoration: none; }
+
+  /* 分享圖 */
+  #share { gap: 14px; text-align: center; }
+  #share img { width: 100%; border-radius: 16px; box-shadow: var(--shadow); }
+  #share p { color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
+  footer { text-align: center; font-size: 11.5px; color: var(--ink-soft); padding-top: 18px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">佛光山 ｜ @fgs_ig</div>
+
+  <section id="intro" class="screen on">
+    <svg class="lotus" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+      <path d="M32 12c6 7 6 19 0 28-6-9-6-21 0-28Z"/><path d="M32 40c-4-9-12-14-21-13 1 9 9 15 21 13Z"/>
+      <path d="M32 40c4-9 12-14 21-13-1 9-9 15-21 13Z"/><path d="M14 46c10 3 26 3 36 0"/>
+    </svg>
+    <h1 class="serif">此刻的你，<br>需要哪一句<br><em>星雲大師</em>的話？</h1>
+    <p>回答 5 個小問題<br>收下一句陪你度過今天的法語</p>
+    <button class="btn" id="start">開始</button>
+  </section>
+
+  <section id="quiz" class="screen">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="qno" id="qno"></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <button class="back" id="back">← 上一題</button>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="tag">給此刻的你</div>
+    <div class="rtitle serif" id="rtitle"></div>
+    <div class="rlead" id="rlead"></div>
+    <div class="quote">
+      <div class="qbody serif" id="qbody"></div>
+      <div class="qby">── 星雲大師</div>
+      <div class="qsrc" id="qsrc"></div>
+    </div>
+    <div class="note" id="note"></div>
+    <div class="row">
+      <button class="btn ghost" id="another">再給我一句</button>
+      <button class="btn" id="makecard">存成限動圖</button>
+    </div>
+    <button class="btn ghost" id="again">重新測一次</button>
+    <div class="follow">每天一句法語陪你<br>追蹤 <a href="https://www.instagram.com/fgs_ig/" target="_blank" rel="noopener">@fgs_ig</a></div>
+  </section>
+
+  <section id="share" class="screen">
+    <img id="cardimg" alt="法語圖卡">
+    <p>長按圖片「儲存」，再分享到限動<br>記得標記 <b>@fgs_ig</b> 喔</p>
+    <button class="btn ghost" id="backresult">← 回到結果</button>
+  </section>
+
+  <footer>法語出自《星雲大師全集》，點出處可看原文<br>佛光山寺 © 本測驗僅供自我覺察，不是占卜</footer>
+</main>
+
+<script>
+// 6 種狀態：每句都出自《星雲大師全集》，與 IG 已發布的法語相同（逐字核對過），note 是小編的話
+const RESULTS = {
+  tired: {
+    title: "電量不足的你", lead: "最近真的辛苦了。先別急著充滿，充一點點也很好。",
+    quotes: [
+      { t: "在忙碌的生活中，只要能將心靜下來（人忙心不忙），凡事皆能安然度過。",
+        s: "《星雲日記1》p318 創造全面的人生", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7825",
+        n: "事情多沒關係，<b>人忙心不忙</b>。先深呼吸三次，再一件一件來。" },
+      { t: "閒時要珍惜忙的一刻，忙時要珍惜閒的一刻。",
+        s: "《星雲日記3》p016 蓮花生長在汙泥中", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7924",
+        n: "今天偷到的十分鐘空檔，就<b>好好享受它</b>，不用有罪惡感。" },
+      { t: "人一生做事，辛苦不要緊，慢慢來不著急，只要不死，都有希望依願力去實現自己的理想。",
+        s: "《星雲日記4》p068 如何自處", u: "https://books.masterhsingyun.org/ArticleDetail/artcle8031",
+        n: "累了就<b>慢一點</b>。理想不會跑掉，你也不用跟誰比速度。" },
+    ],
+  },
+  anxious: {
+    title: "想太多的你", lead: "腦袋停不下來的時候，先把心拉回「現在」這一秒。",
+    quotes: [
+      { t: "不為昨天困，昨天已過去；\n不被明天迷，明天尚未至。\n用心面對今天，天天都不困不迷。",
+        s: "《佛光菜根譚2》p004 十方圓滿‧義", u: "https://books.masterhsingyun.org/ArticleDetail/artcle3453",
+        n: "昨天改不了，明天還沒來，<b>今天才是你的</b>。" },
+      { t: "無論多久以前訂下來的日程，總會到來；無論多苦多樂的事，也會過去。",
+        s: "《人間佛教語錄2》生活應用篇 生活觀", u: "https://books.masterhsingyun.org/ArticleDetail/artcle681",
+        n: "讓你緊張的那件事，<b>終究會過去</b>。到時候回頭看，你會發現自己撐過來了。" },
+      { t: "聰明的人，不會緬懷過去，也不憧憬未來，而是及時把握現在，努力振作。",
+        s: "《人間佛教語錄2》生活應用篇 生活觀", u: "https://books.masterhsingyun.org/ArticleDetail/artcle681",
+        n: "把擔心的力氣，拿來<b>做好眼前這一件事</b>就夠了。" },
+    ],
+  },
+  lost: {
+    title: "還在找路的你", lead: "不知道方向，不代表走錯路。很多答案是邊走邊找到的。",
+    quotes: [
+      { t: "生活原就是各種嘗試，人生要不斷開拓。",
+        s: "《星雲日記4》p068 如何自處", u: "https://books.masterhsingyun.org/ArticleDetail/artcle8031",
+        n: "還沒想清楚也沒關係，<b>先試試看</b>，路是走出來的。" },
+      { t: "一個人只要有心、肯學習，環境並非絕對的因素。",
+        s: "《星雲日記3》p016 蓮花生長在汙泥中", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7924",
+        n: "條件不完美也能開始。<b>有心、肯學</b>，就是最好的起點。" },
+      { t: "有心，即使十萬里路也不算遠；\n無心，即使近在隔鄰也走不到。",
+        s: "《佛光菜根譚2》p066 十方圓滿‧道", u: "https://books.masterhsingyun.org/ArticleDetail/artcle3454",
+        n: "距離不是問題，<b>心在不在</b>才是。先找一件讓你願意用心的小事。" },
+    ],
+  },
+  upset: {
+    title: "心裡有點悶的你", lead: "受委屈的感覺不好受。先照顧好自己的心，再來想怎麼做。",
+    quotes: [
+      { t: "受一點委屈沒有什麼了不起，不要在人我事務上鬥氣，要在學問道德上爭長短！",
+        s: "《星雲日記2》p174 日日觀音", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7855",
+        n: "跟人賭氣很耗電。把力氣<b>留給讓自己變更好的事</b>。" },
+      { t: "人生不能只是往前直衝，有的時候退一步思量，往往能有海闊天空的視野。",
+        s: "《人間佛教語錄2》生活應用篇 生活觀", u: "https://books.masterhsingyun.org/ArticleDetail/artcle681",
+        n: "退一步不是認輸，是<b>給自己看清楚的空間</b>。" },
+      { t: "臨事肯替別人想，是第一等學問。",
+        s: "《星雲日記3》p312 依法不依人", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7931",
+        n: "試著想想對方的處境，<b>心裡的結</b>常常就鬆了一半。" },
+    ],
+  },
+  down: {
+    title: "需要抱一下的你", lead: "低潮的時候，不用逼自己馬上好起來。這一句先陪著你。",
+    quotes: [
+      { t: "人是為了快樂才到人間來的，不是為了煩惱才來人間的。",
+        s: "《星雲日記4》p068 如何自處", u: "https://books.masterhsingyun.org/ArticleDetail/artcle8031",
+        n: "你值得快樂。今天就<b>做一件讓自己開心的小事</b>吧。" },
+      { t: "遇到瓶頸時要自我突破，沒有寒徹骨的歷練，哪有梅花的芬芳？",
+        s: "《星雲日記1》p280 安心立命", u: "https://books.masterhsingyun.org/ArticleDetail/artcle7824",
+        n: "現在的冷，是<b>開花前的準備</b>。撐住，你比想像中堅強。" },
+      { t: "為人處事在遇到困境、瓶頸時，要能如「水」：遇山水轉，遇石水轉，遇岸水轉，無論遇到誰，我轉！",
+        s: "《佛光菜根譚1》p216 三際融通‧行", u: "https://books.masterhsingyun.org/ArticleDetail/artcle1339",
+        n: "推不動的時候，<b>換個方向</b>也是一種前進。" },
+    ],
+  },
+  ready: {
+    title: "準備出發的你", lead: "你心裡有一股想做點什麼的力量，好好珍惜它。",
+    quotes: [
+      { t: "人就怕不發心，一發心凡事可化渺小為偉大，化平庸為神奇。",
+        s: "《星雲日記4》p146 皆大歡喜", u: "https://books.masterhsingyun.org/ArticleDetail/artcle8042",
+        n: "<b>願意開始</b>，就已經贏了一半。" },
+      { t: "在人生道路上，每個人都要創紀錄，只有在創紀錄中，才能不斷提升自我。",
+        s: "《星雲日記4》p068 如何自處", u: "https://books.masterhsingyun.org/ArticleDetail/artcle8031",
+        n: "不用跟別人比，<b>比昨天的自己好一點</b>就是新紀錄。" },
+      { t: "願力有多堅，力量就有多強。",
+        s: "《人間佛教語錄3》宗門思想篇 薪火傳燈", u: "https://books.masterhsingyun.org/ArticleDetail/artcle727",
+        n: "把目標說清楚、放在心上，<b>力量會自己長出來</b>。" },
+    ],
+  },
+};
+
+// 5 題；每個選項加分給一到兩種狀態
+const QUESTIONS = [
+  { q: "最近的你，比較像哪一個？", o: [
+    ["🪫", "電量剩 1%，只想躺平", { tired: 2 }],
+    ["🌀", "腦袋轉個不停，停不下來", { anxious: 2 }],
+    ["🫥", "不太確定自己想要什麼", { lost: 2 }],
+    ["😮‍💨", "有點悶，想翻白眼", { upset: 2 }],
+  ]},
+  { q: "這週最常冒出來的念頭是？", o: [
+    ["☁️", "「好想放空一下」", { tired: 1, down: 1 }],
+    ["⏳", "「萬一……怎麼辦？」", { anxious: 2 }],
+    ["🌧️", "「為什麼又是我？」", { upset: 1, down: 1 }],
+    ["🔥", "「我應該可以更好」", { ready: 2 }],
+  ]},
+  { q: "朋友突然約你出去，你會？", o: [
+    ["🛋️", "改天吧，今天只想待在家", { tired: 2 }],
+    ["☕", "好啊，正好想找人聊聊", { down: 1, anxious: 1 }],
+    ["🤷", "去哪都可以，我沒什麼想法", { lost: 2 }],
+    ["🚀", "走！順便聊聊接下來的計畫", { ready: 2 }],
+  ]},
+  { q: "睡前滑手機，你最常停在？", o: [
+    ["🐱", "療癒的貓狗影片", { tired: 1, down: 1 }],
+    ["📈", "存錢、工作、未來規劃", { anxious: 1, ready: 1 }],
+    ["📱", "別人的生活，好像都比我精彩", { lost: 1, down: 1 }],
+    ["💬", "吵很兇的留言區", { upset: 2 }],
+  ]},
+  { q: "現在的你，最想聽到哪一句？", o: [
+    ["🍵", "「辛苦了，休息一下吧」", { tired: 2 }],
+    ["🌤️", "「別擔心，會過去的」", { anxious: 2 }],
+    ["🧭", "「慢慢來，你會找到的」", { lost: 2 }],
+    ["🤝", "「我懂你的委屈」", { upset: 2 }],
+    ["🫂", "「你已經做得很好了」", { down: 2 }],
+    ["✨", "「放手去做吧」", { ready: 2 }],
+  ]},
+];
+
+const $ = (id) => document.getElementById(id);
+let answers = [], step = 0, state = null, qi = 0;
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+function renderQuestion() {
+  const item = QUESTIONS[step];
+  $("bar").style.width = `${(step / QUESTIONS.length) * 100}%`;
+  $("qno").textContent = `${step + 1} / ${QUESTIONS.length}`;
+  $("qtext").textContent = item.q;
+  $("opts").innerHTML = "";
+  item.o.forEach(([emo, text, score], i) => {
+    const b = document.createElement("button");
+    b.className = "opt" + (answers[step] === i ? " picked" : "");
+    b.innerHTML = `<span class="emo">${emo}</span><span>${text}</span>`;
+    b.onclick = () => pick(i, b);
+    $("opts").appendChild(b);
+  });
+  $("back").style.visibility = step === 0 ? "hidden" : "visible";
+}
+
+function pick(i, el) {
+  answers[step] = i;
+  el.classList.add("picked");
+  setTimeout(() => {
+    if (step < QUESTIONS.length - 1) { step++; renderQuestion(); }
+    else finish();
+  }, 220);
+}
+
+function finish() {
+  $("bar").style.width = "100%";
+  const total = {};
+  answers.forEach((a, s) => Object.entries(QUESTIONS[s].o[a][2]).forEach(([k, v]) => (total[k] = (total[k] || 0) + v)));
+  const best = Math.max(...Object.values(total));
+  const tied = Object.keys(total).filter((k) => total[k] === best);
+  // 同分時看最後一題選了什麼（最能代表「現在想聽的話」）
+  const lastPick = Object.keys(QUESTIONS[4].o[answers[4]][2])[0];
+  state = tied.includes(lastPick) ? lastPick : tied[Math.floor(Math.random() * tied.length)];
+  qi = Math.floor(Math.random() * 3);
+  renderResult();
+  show("result");
+}
+
+function renderResult() {
+  const r = RESULTS[state], q = r.quotes[qi];
+  $("rtitle").textContent = r.title;
+  $("rlead").textContent = r.lead;
+  $("qbody").textContent = q.t;
+  $("qsrc").innerHTML = `出處：<a href="${q.u}" target="_blank" rel="noopener">${q.s}</a>`;
+  $("note").innerHTML = `<b>小編想說：</b>${q.n}`;
+}
+
+// 9:16 限動圖卡：用 canvas 畫，產生圖片讓使用者長按儲存（IG 內建瀏覽器常擋下載）
+function wrapLines(ctx, text, maxWidth) {
+  const lines = [];
+  text.split("\n").forEach((para) => {
+    let line = "";
+    for (const ch of para) {
+      const test = line + ch;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        // 標點不放行首
+        if ("，。、；：！？」）』".includes(ch)) { lines.push(test); line = ""; continue; }
+        lines.push(line); line = ch;
+      } else line = test;
+    }
+    if (line) lines.push(line);
+  });
+  return lines;
+}
+
+async function makeCard() {
+  const r = RESULTS[state], q = r.quotes[qi];
+  await Promise.all([document.fonts.load('700 60px "Noto Serif TC"'), document.fonts.load('500 40px "Noto Sans TC"')]).catch(() => {});
+  const W = 1080, H = 1920, c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  const g = x.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#3d2e22"); g.addColorStop(1, "#1a130e");
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const glow = x.createRadialGradient(W / 2, H * 0.45, 50, W / 2, H * 0.45, 700);
+  glow.addColorStop(0, "rgba(201,155,82,.28)"); glow.addColorStop(1, "rgba(201,155,82,0)");
+  x.fillStyle = glow; x.fillRect(0, 0, W, H);
+
+  x.textAlign = "center";
+  x.fillStyle = "#d9b26a";
+  x.font = '500 38px "Noto Sans TC", sans-serif';
+  x.fillText("給此刻的你", W / 2, 330);
+  x.font = '700 64px "Noto Serif TC", serif';
+  x.fillStyle = "#f3e7d3";
+  x.fillText(r.title, W / 2, 425);
+  x.strokeStyle = "rgba(217,178,106,.6)"; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(W / 2 - 70, 480); x.lineTo(W / 2 + 70, 480); x.stroke();
+
+  let size = 62;
+  x.font = `700 ${size}px "Noto Serif TC", serif`;
+  let lines = wrapLines(x, q.t, 820);
+  while (lines.length > 8 && size > 46) { size -= 4; x.font = `700 ${size}px "Noto Serif TC", serif`; lines = wrapLines(x, q.t, 820); }
+  const lh = size * 1.75, top = 960 - (lines.length * lh) / 2 + size * 0.4;
+  x.fillStyle = "#fbf3e4";
+  lines.forEach((l, i) => x.fillText(l, W / 2, top + i * lh));
+
+  const after = top + lines.length * lh + 40;
+  x.fillStyle = "#d9b26a";
+  x.font = '500 40px "Noto Sans TC", sans-serif';
+  x.fillText("── 星雲大師", W / 2, after + 30);
+  x.fillStyle = "rgba(243,231,211,.6)";
+  x.font = '400 28px "Noto Sans TC", sans-serif';
+  x.fillText(q.s, W / 2, after + 85);
+
+  x.fillStyle = "rgba(243,231,211,.75)";
+  x.font = '500 34px "Noto Sans TC", sans-serif';
+  x.fillText("佛光山 @fgs_ig", W / 2, H - 230);
+  $("cardimg").src = c.toDataURL("image/jpeg", 0.92);
+  show("share");
+}
+
+$("start").onclick = () => { answers = []; step = 0; renderQuestion(); show("quiz"); };
+$("back").onclick = () => { if (step > 0) { step--; renderQuestion(); } };
+$("another").onclick = () => { qi = (qi + 1) % 3; renderResult(); };
+$("again").onclick = () => show("intro");
+$("makecard").onclick = makeCard;
+$("backresult").onclick = () => show("result");
+</script>
+</body>
+</html>
